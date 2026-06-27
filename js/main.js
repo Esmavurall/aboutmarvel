@@ -26,7 +26,7 @@ const grid = document.getElementById("grid");       // kartların basıldığı 
 const empty = document.getElementById("empty");      // "sonuç yok" mesajı
 const search = document.getElementById("search");    // arama kutusu
 const filtersEl = document.getElementById("filters"); // faz çiplerinin konteyneri
-
+console.log("Katalog.js: %c%s", "color: #f00; font-weight: bold;", "MCU katalogu yüklendi.");
 // --- Uygulama durumu: o an seçili filtre ve arama metni ---
 let activeFilter = "Tümü";
 let query = "";
