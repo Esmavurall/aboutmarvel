@@ -1,0 +1,208 @@
+/* ---- Genel ---- */
+html { scroll-behavior: smooth; }
+
+::selection { background: #e62429; color: #fff; }
+
+/* İnce kaydırma çubuğu */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #07090f; }
+::-webkit-scrollbar-thumb { background: #2a2f3a; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #3a4150; }
+
+/* Arka plan ışıltısı */
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 80% -10%, rgba(230, 36, 41, 0.18), transparent 60%),
+    radial-gradient(50rem 40rem at -10% 20%, rgba(59, 130, 246, 0.14), transparent 60%);
+}
+
+.text-balance { text-wrap: balance; }
+
+/* ---- Film kartı (broşür kapağı) ---- */
+.film-card {
+  position: relative;
+  border-radius: 1.1rem;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  cursor: pointer;
+  isolation: isolate;
+  background: #0d0f16;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transform: translateZ(0);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.5s ease;
+  will-change: transform;
+}
+
+.film-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8),
+              0 0 40px -10px var(--glow, rgba(230, 36, 41, 0.45));
+}
+
+/* Kapak görseli / gradient fallback */
+.film-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  transform: scale(1.02);
+}
+.film-card:hover .film-cover { transform: scale(1.08); }
+
+/* Three.js plane görünürken DOM görselini saklamak için */
+.film-card.fx-active .film-cover { opacity: 0; }
+
+/* Three.js katmanı: kartın içinde, görselin üstünde ama yazıların ALTINDA */
+.fx-layer {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.film-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.film-fallback span {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.4rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.22);
+  text-align: center;
+  padding: 0 1rem;
+}
+
+/* Karartma katmanı (yazı okunurluğu) */
+.film-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: linear-gradient(
+    to top,
+    rgba(5, 6, 10, 0.96) 0%,
+    rgba(5, 6, 10, 0.7) 28%,
+    rgba(5, 6, 10, 0.1) 55%,
+    rgba(5, 6, 10, 0) 75%
+  );
+}
+
+/* Rozetler */
+.film-badges {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.9rem;
+  right: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 4;
+}
+
+/* İçerik */
+.film-content {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.3rem;
+}
+
+.film-title {
+  font-family: "Bebas Neue", sans-serif;
+  line-height: 0.92;
+  letter-spacing: 0.02em;
+  font-size: 2rem;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.6);
+}
+
+.film-scene {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: #ffd3d4;
+  margin-top: 0.35rem;
+}
+
+/* Hover'da açılan detay paneli */
+.film-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.4s ease, margin-top 0.4s ease;
+  margin-top: 0;
+}
+.film-card:hover .film-detail {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 0.75rem;
+}
+.film-detail-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.film-summary {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #d4d4d8;
+}
+
+.cast-chip {
+  font-size: 0.68rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e4e4e7;
+  white-space: nowrap;
+}
+
+/* Filtre çipleri */
+.chip {
+  font-size: 0.75rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 99px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #a1a1aa;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+.chip:hover { color: #fff; border-color: rgba(255, 255, 255, 0.25); }
+.chip.active {
+  background: #e62429;
+  border-color: #e62429;
+  color: #fff;
+}
+
+/* Giriş animasyonu */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.film-card { animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .film-card, .film-cover, .film-detail { transition: none; animation: none; }
+}

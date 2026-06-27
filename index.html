@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MARVEL · Sinematik Evren Kataloğu</title>
+  <meta name="description" content="Marvel filmlerinin vurucu sahneleriyle hazırlanmış broşür kataloğu." />
+
+  <!-- Tailwind (Play CDN — build gerektirmez) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Bebas Neue"', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            marvel: '#e62429',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Fontlar -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Three.js (ESM importmap — bundler gerektirmez) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-[#07090f] text-zinc-100 font-body antialiased overflow-x-hidden">
+  <!-- Arka plan ışıltısı -->
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- HERO -->
+  <header class="relative z-10 mx-auto max-w-7xl px-6 pt-20 pb-10 text-center">
+    <p class="mb-4 inline-block rounded-full border border-white/10 bg-white/5 px-4 py-1 text-xs uppercase tracking-[0.35em] text-zinc-400">
+      Marvel Studios · Sinematik Evren
+    </p>
+    <h1 class="font-display text-6xl leading-none tracking-wide sm:text-8xl">
+      MARVEL <span class="text-marvel">EVRENİ</span> KATALOĞU
+    </h1>
+    <p class="mx-auto mt-6 max-w-2xl text-balance text-zinc-400">
+      Her filmin en unutulmaz anı, bir broşür kapağında. Üzerine gel — sahne 3 boyutlu canlansın,
+      hikâyenin perdesi aralansın.
+    </p>
+
+    <!-- Arama + Faz filtresi -->
+    <div class="mx-auto mt-10 flex max-w-2xl flex-col items-center gap-4">
+      <input
+        id="search"
+        type="search"
+        placeholder="Film, oyuncu veya yönetmen ara…"
+        class="w-full rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none transition focus:border-marvel/60 focus:bg-white/10"
+      />
+      <div id="filters" class="flex flex-wrap justify-center gap-2"></div>
+    </div>
+  </header>
+
+  <!-- KATALOG -->
+  <main class="relative z-10 mx-auto max-w-7xl px-6 pb-28">
+    <div id="grid" class="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3"></div>
+    <p id="empty" class="hidden py-20 text-center text-zinc-500">Eşleşen film bulunamadı.</p>
+  </main>
+
+  <footer class="relative z-10 border-t border-white/5 py-8 text-center text-xs text-zinc-600">
+    Görseller © The Movie Database (TMDB) · Marvel ve film isimleri Marvel Studios'a aittir.
+    Bu sayfa hayran kataloğu amaçlıdır.
+  </footer>
+
+  <!-- Arka plan 3B yıldız alanı (dekoratif; yüklenemezse sayfa etkilenmez) -->
+  <script type="module" src="js/starfield.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

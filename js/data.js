@@ -1,0 +1,567 @@
+/* ============================================================================
+ * data.js — TEK VERİ KAYNAĞI (Marvel Sinematik Evreni / MCU)
+ * `FILMS` dizisini dışa aktarır. main.js bu diziden kartları üretir.
+ *
+ * Her film nesnesinin alanları:
+ *   id       : benzersiz kimlik (görsel dosya adlarıyla AYNI olmalı)
+ *   title    : film ismi          | year   : yıl       | phase: "Faz 1..5"
+ *   producer : yapımcı            | director: yönetmen
+ *   cast[]   : başrol oyuncuları  | summary: merak uyandıran özet
+ *   scene    : vurucu sahne etiketi
+ *   colorA/B : kart paleti (görsel yüklenemezse gradient ve parıltı rengi)
+ *   img      : (sonda eklenir) durağan kapak görseli
+ *   hoverImg : (sonda eklenir) hover'da gösterilen farklı sahne
+ *
+ * Görseller YEREL klasörden sunulur; dış siteye (TMDB) bağımlı değildir.
+ * (IMG yardımcı fonksiyonu yalnızca görsellerin kaynağını belgeler; gerçek
+ *  yollar dosyanın sonundaki forEach ile yerel klasöre bağlanır.)
+ * ========================================================================== */
+const IMG = (p) => `https://image.tmdb.org/t/p/w1280${p}`;
+
+const FILMS = [
+  // ───────────────────────── FAZ 1 ─────────────────────────
+  {
+    id: "iron-man",
+    title: "Iron Man",
+    year: 2008,
+    phase: "Faz 1",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Jon Favreau",
+    cast: ["Robert Downey Jr.", "Gwyneth Paltrow", "Jeff Bridges", "Terrence Howard"],
+    summary:
+      "Silah tüccarı dahi Tony Stark bir esaret sırasında ölümle yüzleşir ve bir mağarada hayatını kurtaracak şeyi inşa eder. Peki bir milyarder, dünyanın en güçlü zırhını giydiğinde kim olur?",
+    scene: "Mağaradan kaçış: ilk zırhın alevler içinde doğuşu",
+    img: IMG("/cyecB7godJ6kNHGONFjUyVN9OX5.jpg"),
+    colorA: "#c8941f",
+    colorB: "#6e1414",
+  },
+  {
+    id: "incredible-hulk",
+    title: "The Incredible Hulk",
+    year: 2008,
+    phase: "Faz 1",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Louis Leterrier",
+    cast: ["Edward Norton", "Liv Tyler", "Tim Roth", "William Hurt"],
+    summary:
+      "İçindeki canavardan kaçan bilim insanı Bruce Banner, öfkesini kontrol etmenin yolunu ararken peşine düşen orduyla yüzleşir. Ama gerçek tehlike, onun gibi olmak isteyen biri ortaya çıktığında başlar.",
+    scene: "Harlem'de iki dev canavarın sokak savaşı",
+    img: IMG("/jPu8yiadqgzwFPGKJmGo637ASVP.jpg"),
+    colorA: "#166534",
+    colorB: "#0a0a0a",
+  },
+  {
+    id: "iron-man-2",
+    title: "Iron Man 2",
+    year: 2010,
+    phase: "Faz 1",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Jon Favreau",
+    cast: ["Robert Downey Jr.", "Gwyneth Paltrow", "Don Cheadle", "Mickey Rourke", "Sam Rockwell"],
+    summary:
+      "Kimliğini dünyaya açıklayan Tony Stark, onu hayatta tutan teknolojinin aynı zamanda onu zehirlediğini keşfeder. Geçmişin günahları, elektrikli kırbaçlarla kapısını çaldığında...",
+    scene: "Monako pistinde kırbaçlı saldırı",
+    img: IMG("/7lmBufEG7P7Y1HClYK3gCxYrkgS.jpg"),
+    colorA: "#991b1b",
+    colorB: "#b8860b",
+  },
+  {
+    id: "thor",
+    title: "Thor",
+    year: 2011,
+    phase: "Faz 1",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Kenneth Branagh",
+    cast: ["Chris Hemsworth", "Natalie Portman", "Tom Hiddleston", "Anthony Hopkins"],
+    summary:
+      "Kibirli bir tanrı, gücünden edilip Dünya'ya sürgün edilir. Çekicini yeniden kaldırmaya layık olmak için, bir prensin nasıl gerçek bir kral olduğunu öğrenmesi gerekir.",
+    scene: "Gökkuşağı köprüsü Bifrost'un parçalanışı",
+    img: IMG("/jWAJlgICJbn2kyohrokteRoD3cZ.jpg"),
+    colorA: "#1d4ed8",
+    colorB: "#ca8a04",
+  },
+  {
+    id: "first-avenger",
+    title: "Captain America: The First Avenger",
+    year: 2011,
+    phase: "Faz 1",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Joe Johnston",
+    cast: ["Chris Evans", "Hayley Atwell", "Hugo Weaving", "Sebastian Stan", "Tommy Lee Jones"],
+    summary:
+      "İkinci Dünya Savaşı'nda zayıf bir genç, deneysel bir serumla en iyi asker olur. Ama gerçek kahramanlık kasta değil yürektedir — ve bir buz tabakası onu zamanın dışına taşıyacaktır.",
+    scene: "Buzlu uçağın kasıtlı düşüşü ve son veda",
+    img: IMG("/yFuKvT4Vm3sKHdFY4eG6I4ldAnn.jpg"),
+    colorA: "#1e3a5f",
+    colorB: "#7f1d1d",
+  },
+  {
+    id: "avengers",
+    title: "The Avengers",
+    year: 2012,
+    phase: "Faz 1",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Joss Whedon",
+    cast: ["Robert Downey Jr.", "Chris Evans", "Chris Hemsworth", "Scarlett Johansson", "Mark Ruffalo"],
+    summary:
+      "Tek başına yeterli olmayan kahramanlar, dünyayı yok edecek bir tehdit karşısında ilk kez bir araya gelir. Egolar çarpışırken gökyüzü yarılıyor — kazanmak için önce birbirlerine güvenmeleri gerek.",
+    scene: "New York Savaşı: takımın daire olup kuşatıldığı an",
+    img: IMG("/9BBTo63ANSmhC4e6r62OJFuK2GL.jpg"),
+    colorA: "#1e40af",
+    colorB: "#7f1d1d",
+  },
+
+  // ───────────────────────── FAZ 2 ─────────────────────────
+  {
+    id: "iron-man-3",
+    title: "Iron Man 3",
+    year: 2013,
+    phase: "Faz 2",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Shane Black",
+    cast: ["Robert Downey Jr.", "Gwyneth Paltrow", "Guy Pearce", "Ben Kingsley"],
+    summary:
+      "New York Savaşı'nın travmasıyla uyuyamayan Tony Stark, her şeyini kaybeder. Zırhsız, yalnız ve köşeye sıkışmışken gerçek soruyla yüzleşir: Adamı zırh mı yapar, yoksa adam mı zırhı?",
+    scene: "Malikânenin helikopterlerle yerle bir edilişi",
+    img: IMG("/iVped1djsF0tvGkvnHbzsE3ZPTF.jpg"),
+    colorA: "#b91c1c",
+    colorB: "#ea580c",
+  },
+  {
+    id: "thor-dark-world",
+    title: "Thor: The Dark World",
+    year: 2013,
+    phase: "Faz 2",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Alan Taylor",
+    cast: ["Chris Hemsworth", "Natalie Portman", "Tom Hiddleston", "Christopher Eccleston"],
+    summary:
+      "Evreni karanlığa gömmek isteyen kadim bir düşman uyanır. Thor, en güvenmediği kişiyle — kardeşi Loki ile — ittifak kurmak zorunda kaldığında ihanet her an mümkün.",
+    scene: "Gerçekliğin büküldüğü Greenwich portallı finali",
+    img: IMG("/5QEOy0QEpad9QsXeMxuGHPXMale.jpg"),
+    colorA: "#7f1d1d",
+    colorB: "#1e293b",
+  },
+  {
+    id: "winter-soldier",
+    title: "Captain America: The Winter Soldier",
+    year: 2014,
+    phase: "Faz 2",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Anthony & Joe Russo",
+    cast: ["Chris Evans", "Scarlett Johansson", "Sebastian Stan", "Anthony Mackie", "Robert Redford"],
+    summary:
+      "Steve Rogers modern dünyaya uyum sağlamaya çalışırken güvendiği kurumun içine sızan bir komployla yüzleşir. Ve geçmişten gelen maskeli bir suikastçının kim olduğunu öğrendiğinde her şey değişir.",
+    scene: "Köprü baskını: Kış Askeri'nin maskesinin düştüğü an",
+    img: IMG("/1RWLMyC9KcFfcaoViMiJGSSZzzr.jpg"),
+    colorA: "#334155",
+    colorB: "#0b1220",
+  },
+  {
+    id: "guardians",
+    title: "Guardians of the Galaxy",
+    year: 2014,
+    phase: "Faz 2",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "James Gunn",
+    cast: ["Chris Pratt", "Zoe Saldana", "Dave Bautista", "Vin Diesel", "Bradley Cooper"],
+    summary:
+      "Bir hırsız, bir suikastçı, bir intikamcı, konuşan bir rakun ve bir ağaç... Galaksinin en olası olmayan kahramanları, evreni yok edecek bir küreyi korumak için bir araya gelir. Hazır mısın dans dövüşüne?",
+    scene: "Gezegeni kurtaran el ele tutuşma anı",
+    img: IMG("/uLtVbjvS1O7gXL8lUOwsFOH4man.jpg"),
+    colorA: "#7c3aed",
+    colorB: "#ea580c",
+  },
+  {
+    id: "age-of-ultron",
+    title: "Avengers: Age of Ultron",
+    year: 2015,
+    phase: "Faz 2",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Joss Whedon",
+    cast: ["Robert Downey Jr.", "Chris Evans", "Chris Hemsworth", "Scarlett Johansson", "James Spader"],
+    summary:
+      "Dünyayı korumak için yaratılan yapay zekâ, insanlığı kurtarmanın tek yolunun onu yok etmek olduğuna karar verir. Yenilmezler, kendi elleriyle doğurdukları kâbusla yüzleşir.",
+    scene: "Sokovia'nın gökyüzüne yükseldiği an",
+    img: IMG("/kIBK5SKwgqIIuRKhhWrJn3XkbPq.jpg"),
+    colorA: "#991b1b",
+    colorB: "#334155",
+  },
+  {
+    id: "ant-man",
+    title: "Ant-Man",
+    year: 2015,
+    phase: "Faz 2",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Peyton Reed",
+    cast: ["Paul Rudd", "Evangeline Lilly", "Michael Douglas", "Corey Stoll"],
+    summary:
+      "Eski bir hırsız, karıncalara komuta edip atom altı boyuta küçülebilen bir kostüm devralır. En küçük kahraman, en büyük soygunu engellemek için kızına kahraman olduğunu kanıtlamalı.",
+    scene: "Oyuncak tren rayında dev gibi görünen minik savaş",
+    img: IMG("/1K3JmSNUN8OpjYsCjc0Hy0SYxAb.jpg"),
+    colorA: "#0f766e",
+    colorB: "#111827",
+  },
+
+  // ───────────────────────── FAZ 3 ─────────────────────────
+  {
+    id: "civil-war",
+    title: "Captain America: Civil War",
+    year: 2016,
+    phase: "Faz 3",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Anthony & Joe Russo",
+    cast: ["Chris Evans", "Robert Downey Jr.", "Scarlett Johansson", "Sebastian Stan", "Chadwick Boseman"],
+    summary:
+      "Kahramanların gücü denetim altına alınmalı mı? Bu soru takımı ikiye böler. Dost dosta, kalkan zırha karşı — ve bu sefer kazanan taraf yok, sadece kırılan bir aile var.",
+    scene: "Havalimanında iki takımın destansı çarpışması",
+    img: IMG("/wdwcOBMkt3zmPQuEMxB3FUtMio2.jpg"),
+    colorA: "#1d4ed8",
+    colorB: "#b91c1c",
+  },
+  {
+    id: "doctor-strange",
+    title: "Doctor Strange",
+    year: 2016,
+    phase: "Faz 3",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Scott Derrickson",
+    cast: ["Benedict Cumberbatch", "Chiwetel Ejiofor", "Rachel McAdams", "Tilda Swinton", "Mads Mikkelsen"],
+    summary:
+      "Ellerini kaybeden kibirli bir cerrah, şifayı bilimde değil gerçekliğin büküldüğü bir dünyada arar. Zamanı ve mekânı eğip büken bir büyücü olduğunda sınır artık sadece hayal gücüdür.",
+    scene: "Ayna boyutunda eğilip katlanan şehir",
+    img: IMG("/3zvZ699gMW2RhWc0GisIukzq0Ls.jpg"),
+    colorA: "#d97706",
+    colorB: "#155e63",
+  },
+  {
+    id: "guardians-2",
+    title: "Guardians of the Galaxy Vol. 2",
+    year: 2017,
+    phase: "Faz 3",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "James Gunn",
+    cast: ["Chris Pratt", "Zoe Saldana", "Dave Bautista", "Kurt Russell", "Bradley Cooper"],
+    summary:
+      "Peter Quill nihayet babasının kim olduğunu öğrenir — ama bazı sırlar evren kadar tehlikelidir. Aile, sadece kan bağı değildir; bazen onu kendin seçersin.",
+    scene: "Yo-Ho! Yakamoz'lu uzay savaşı ve cenaze havai fişekleri",
+    img: IMG("/bW93ycPSSi3Hxx1NvlMX5qm2mQu.jpg"),
+    colorA: "#ca8a04",
+    colorB: "#be185d",
+  },
+  {
+    id: "homecoming",
+    title: "Spider-Man: Homecoming",
+    year: 2017,
+    phase: "Faz 3",
+    producer: "Marvel Studios & Columbia Pictures — Kevin Feige, Amy Pascal",
+    director: "Jon Watts",
+    cast: ["Tom Holland", "Michael Keaton", "Zendaya", "Marisa Tomei", "Robert Downey Jr."],
+    summary:
+      "15 yaşında bir kahraman, hem matematik sınavını hem mahallesini kurtarmaya çalışıyor. Ama büyük güç büyük sorumluluk getirir — ve Akbaba, onu test edecek kanatlarını açtığında...",
+    scene: "Çöken binanın altında kalıp gücünü zorla bulduğu an",
+    img: IMG("/tPpYGm2mVecue7Bk3gNVoSPA5qn.jpg"),
+    colorA: "#dc2626",
+    colorB: "#1d4ed8",
+  },
+  {
+    id: "thor-ragnarok",
+    title: "Thor: Ragnarok",
+    year: 2017,
+    phase: "Faz 3",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Taika Waititi",
+    cast: ["Chris Hemsworth", "Tom Hiddleston", "Cate Blanchett", "Tessa Thompson", "Mark Ruffalo"],
+    summary:
+      "Çekici paramparça olan Thor, evreninin öbür ucunda bir gladyatör arenasında tutsak düşer — üstelik rakibi eski bir dostu. Asgard yanarken bir tanrı, gücünün çekiçten gelmediğini öğrenmek zorunda.",
+    scene: "Şimşeğe dönüşüş: köprüdeki destansı yürüyüş",
+    img: IMG("/wBzMnQ01R9w58W6ucltdYfOyP4j.jpg"),
+    colorA: "#be185d",
+    colorB: "#f59e0b",
+  },
+  {
+    id: "black-panther",
+    title: "Black Panther",
+    year: 2018,
+    phase: "Faz 3",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Ryan Coogler",
+    cast: ["Chadwick Boseman", "Michael B. Jordan", "Lupita Nyong'o", "Danai Gurira", "Letitia Wright"],
+    summary:
+      "Dünyaya geri kalmış görünen ama teknolojide herkesi geçen gizli krallık Wakanda... Yeni kral T'Challa, tahtını gölgede büyüyen bir akrabaya karşı savunurken bir ulusun ruhuyla yüzleşir.",
+    scene: "Şelale ritüeli: taht için tek mücadele",
+    img: IMG("/19Ed4XgjahPm4U8JT7SnntERIlt.jpg"),
+    colorA: "#4c1d95",
+    colorB: "#111827",
+  },
+  {
+    id: "infinity-war",
+    title: "Avengers: Infinity War",
+    year: 2018,
+    phase: "Faz 3",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Anthony & Joe Russo",
+    cast: ["Robert Downey Jr.", "Chris Hemsworth", "Josh Brolin", "Chris Evans", "Benedict Cumberbatch"],
+    summary:
+      "On yıllık yolculuk tek bir isimde birleşiyor: Thanos. Altı Sonsuzluk Taşı'nı toplayıp evrenin yarısını parmak şıklatmasıyla silmeye gelen bir titan karşısında tüm kahramanlar yeter mi?",
+    scene: "Parmak şıklatması ve toza dönüşen kahramanlar",
+    img: IMG("/mDfJG3LC3Dqb67AZ52x3Z0jU0uB.jpg"),
+    colorA: "#6d28d9",
+    colorB: "#1e3a8a",
+  },
+  {
+    id: "ant-man-wasp",
+    title: "Ant-Man and the Wasp",
+    year: 2018,
+    phase: "Faz 3",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Peyton Reed",
+    cast: ["Paul Rudd", "Evangeline Lilly", "Michael Douglas", "Michelle Pfeiffer"],
+    summary:
+      "Scott Lang, ev hapsindeyken kuantum boyutunda kaybolan birini geri getirmek için yeni bir ortakla güçlerini birleştirir. Bazen kahraman olmak, sadece doğru anda küçülmektir.",
+    scene: "San Francisco sokaklarında boyut değiştiren araba kovalamacası",
+    img: IMG("/iYdgEUE2W2aJkgqfSjf1x3gFfuV.jpg"),
+    colorA: "#0d9488",
+    colorB: "#be185d",
+  },
+  {
+    id: "captain-marvel",
+    title: "Captain Marvel",
+    year: 2019,
+    phase: "Faz 3",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Anna Boden & Ryan Fleck",
+    cast: ["Brie Larson", "Samuel L. Jackson", "Jude Law", "Ben Mendelsohn"],
+    summary:
+      "Hafızası parçalanmış bir savaşçı, geçmişinin yıldızlar arası bir savaşın anahtarı olduğunu keşfeder. Kendisine dayatılan sınırları aştığında evrenin en güçlü kahramanlarından biri doğar.",
+    scene: "Sınırların yıkıldığı kozmik enerji patlaması",
+    img: IMG("/qAzYK4YPSWDc7aa4R43LcwRIAyb.jpg"),
+    colorA: "#0d9488",
+    colorB: "#b91c1c",
+  },
+  {
+    id: "endgame",
+    title: "Avengers: Endgame",
+    year: 2019,
+    phase: "Faz 3",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Anthony & Joe Russo",
+    cast: ["Robert Downey Jr.", "Chris Evans", "Mark Ruffalo", "Chris Hemsworth", "Scarlett Johansson"],
+    summary:
+      "Evrenin yarısı yok oldu ve hayatta kalanlar küllerin arasında. Geriye kalan kahramanlar, kaybettikleri her şeyi geri getirmek için imkânsız bir son hamleyi göze alır. Bedeli ne olursa olsun.",
+    scene: "\"Avengers, toplanın\" — portallar açılıyor",
+    img: IMG("/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg"),
+    colorA: "#1f2937",
+    colorB: "#b45309",
+  },
+
+  // ───────────────────────── FAZ 4 ─────────────────────────
+  {
+    id: "black-widow",
+    title: "Black Widow",
+    year: 2021,
+    phase: "Faz 4",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Cate Shortland",
+    cast: ["Scarlett Johansson", "Florence Pugh", "David Harbour", "Rachel Weisz"],
+    summary:
+      "Natasha Romanoff, kahraman olmadan önceki karanlık geçmişinden kaçamaz. Sahte ailesiyle yeniden bir araya gelip onu yaratan tehlikeli komployla yüzleştiğinde hesap günü gelir.",
+    scene: "Serbest düşüşte havada açılan hesaplaşma",
+    img: IMG("/6azpBJGcLx9SKif8h9VMnflBfa.jpg"),
+    colorA: "#991b1b",
+    colorB: "#0a0a0a",
+  },
+  {
+    id: "shang-chi",
+    title: "Shang-Chi and the Legend of the Ten Rings",
+    year: 2021,
+    phase: "Faz 4",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Destin Daniel Cretton",
+    cast: ["Simu Liu", "Awkwafina", "Tony Leung", "Michelle Yeoh"],
+    summary:
+      "Geçmişini geride bıraktığını sanan Shang-Chi, bin yıllık güce sahip babasının çağrısıyla yüzleşmek zorunda kalır. Bir oğul, kaderinden kaçabilir mi yoksa onu kucaklamalı mı?",
+    scene: "Otobüs içinde kayan, nefes kesen dövüş sahnesi",
+    img: IMG("/r7K6Xt0RX4Mw0cAbZVw5cyb1Tux.jpg"),
+    colorA: "#b91c1c",
+    colorB: "#047857",
+  },
+  {
+    id: "eternals",
+    title: "Eternals",
+    year: 2021,
+    phase: "Faz 4",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Chloé Zhao",
+    cast: ["Gemma Chan", "Richard Madden", "Angelina Jolie", "Salma Hayek", "Kumail Nanjiani"],
+    summary:
+      "Binlerce yıldır insanlığın arasında gizlenen ölümsüz varlıklar, neden tarihin en karanlık anlarında müdahale etmediklerini sorgular. Şimdi gezegeni tehdit eden gerçek karşısında saklanamazlar.",
+    scene: "Kadim Celestial'ın okyanustan yükselişi",
+    img: IMG("/c6H7Z4u73ir3cIoCteuhJh7UCAR.jpg"),
+    colorA: "#b45309",
+    colorB: "#0e7490",
+  },
+  {
+    id: "no-way-home",
+    title: "Spider-Man: No Way Home",
+    year: 2021,
+    phase: "Faz 4",
+    producer: "Marvel Studios & Columbia Pictures — Kevin Feige, Amy Pascal",
+    director: "Jon Watts",
+    cast: ["Tom Holland", "Zendaya", "Benedict Cumberbatch", "Tobey Maguire", "Andrew Garfield"],
+    summary:
+      "Kimliği ifşa olan Peter Parker, her şeyi unutturacak bir büyü ister ama büyü ters gider ve çoklu evrenin kapıları açılır. Başka dünyalardan gelen düşmanlar — ve belki tanıdık kahramanlar — eşiğinde.",
+    scene: "Üç Örümcek-Adam'ın ilk karşılaşma anı",
+    img: IMG("/AeK2MPOpYrOOgZNfFnfwp0L8tNn.jpg"),
+    colorA: "#b91c1c",
+    colorB: "#134e4a",
+  },
+  {
+    id: "multiverse-of-madness",
+    title: "Doctor Strange in the Multiverse of Madness",
+    year: 2022,
+    phase: "Faz 4",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Sam Raimi",
+    cast: ["Benedict Cumberbatch", "Elizabeth Olsen", "Xochitl Gomez", "Benedict Wong"],
+    summary:
+      "Çoklu evrenler arasında yolculuk edebilen bir kızın peşindeki karanlık güç, Strange'i en büyük korkusuyla yüzleştirir: Bir başka evrendeki kendisi ve kontrolden çıkan bir dost.",
+    scene: "Evrenler arası geçişte savrulan gerçeklik tüneli",
+    img: IMG("/lv3TXqhpaIxkclIHbhN2MRMOemQ.jpg"),
+    colorA: "#7f1d1d",
+    colorB: "#6d28d9",
+  },
+  {
+    id: "love-and-thunder",
+    title: "Thor: Love and Thunder",
+    year: 2022,
+    phase: "Faz 4",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Taika Waititi",
+    cast: ["Chris Hemsworth", "Natalie Portman", "Christian Bale", "Tessa Thompson"],
+    summary:
+      "Tanrıları katleden bir katil ortaya çıkar ve Thor'un huzur arayışı sona erer. Üstüne, eski sevgilisi çekici kaldırıp yeni bir Thor olarak döndüğünde kalbi de savaş alanına döner.",
+    scene: "Renksiz gölge diyarında ışıldayan tanrılar savaşı",
+    img: IMG("/jsoz1HlxczSuTx0mDl2h0lxy36l.jpg"),
+    colorA: "#db2777",
+    colorB: "#2563eb",
+  },
+  {
+    id: "wakanda-forever",
+    title: "Black Panther: Wakanda Forever",
+    year: 2022,
+    phase: "Faz 4",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Ryan Coogler",
+    cast: ["Letitia Wright", "Lupita Nyong'o", "Danai Gurira", "Tenoch Huerta", "Angela Bassett"],
+    summary:
+      "Kralını kaybeden Wakanda, yasını tutarken denizin derinliklerinden gelen kadim bir uygarlığın tehdidiyle yüzleşir. Bir ulus, kahramanını yitirdiğinde kim pelerini giyecek?",
+    scene: "Su altı krallığı Talokan'ın ortaya çıkışı",
+    img: IMG("/83H0C66AcvkwpG2738VCTHMY9uv.jpg"),
+    colorA: "#1e3a8a",
+    colorB: "#4c1d95",
+  },
+
+  // ───────────────────────── FAZ 5 ─────────────────────────
+  {
+    id: "quantumania",
+    title: "Ant-Man and the Wasp: Quantumania",
+    year: 2023,
+    phase: "Faz 5",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Peyton Reed",
+    cast: ["Paul Rudd", "Evangeline Lilly", "Jonathan Majors", "Michelle Pfeiffer"],
+    summary:
+      "Bir kaza tüm aileyi kuantum boyutuna çeker — kuralların farklı işlediği, gizli bir uygarlığın olduğu bir evren. Burada zamanı yutan bir fatih bekliyor: Kang.",
+    scene: "Kuantum boyutunun uçsuz bucaksız şehrine iniş",
+    img: IMG("/m8JTwHFwX7I7JY5fPe4SjqejWag.jpg"),
+    colorA: "#0d9488",
+    colorB: "#6d28d9",
+  },
+  {
+    id: "guardians-3",
+    title: "Guardians of the Galaxy Vol. 3",
+    year: 2023,
+    phase: "Faz 5",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "James Gunn",
+    cast: ["Chris Pratt", "Zoe Saldana", "Karen Gillan", "Bradley Cooper", "Chukwudi Iwuji"],
+    summary:
+      "Rocket'ın geçmişinin acı verici sırrı açığa çıkarken, takım onu kurtarmak için son bir göreve atılır. Bu sefer kaybetmeyi göze alamayacakları tek şey: birbirleri.",
+    scene: "Koridorda tek planlık destansı takım dövüşü",
+    img: IMG("/5YZbUmjbMa3ClvSW1Wj3D6XGolb.jpg"),
+    colorA: "#ea580c",
+    colorB: "#0d9488",
+  },
+  {
+    id: "the-marvels",
+    title: "The Marvels",
+    year: 2023,
+    phase: "Faz 5",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Nia DaCosta",
+    cast: ["Brie Larson", "Teyonah Parris", "Iman Vellani", "Samuel L. Jackson"],
+    summary:
+      "Güçleri birbirine dolanan üç kahraman, her güç kullandıklarında yer değiştirmeye başlar. Evreni kurtarmak için önce takım olmayı — ve uyum içinde dövüşmeyi — öğrenmeliler.",
+    scene: "Yer değiştirme kaosunda senkronize üçlü dövüş",
+    img: IMG("/w4pRLYYbhHn3sh9kqRgPZM6GjyS.jpg"),
+    colorA: "#0d9488",
+    colorB: "#ca8a04",
+  },
+  {
+    id: "deadpool-wolverine",
+    title: "Deadpool & Wolverine",
+    year: 2024,
+    phase: "Faz 5",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Shawn Levy",
+    cast: ["Ryan Reynolds", "Hugh Jackman", "Emma Corrin", "Morena Baccarin"],
+    summary:
+      "Ağzı bozuk paralı asker, evrenini kurtarmak için isteksiz ve hırçın bir Wolverine'i ikna etmek zorunda. İki ölümsüz, bir araya geldiğinde sonuç: kan, küfür ve katıksız kaos.",
+    scene: "Boşlukta iki ölümsüzün durmak bilmeyen dövüşü",
+    img: IMG("/cOoVcVQ3i1m5b2xtqKBtoTSbxC1.jpg"),
+    colorA: "#b91c1c",
+    colorB: "#ca8a04",
+  },
+  {
+    id: "brave-new-world",
+    title: "Captain America: Brave New World",
+    year: 2025,
+    phase: "Faz 5",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Julius Onah",
+    cast: ["Anthony Mackie", "Harrison Ford", "Liv Tyler", "Tim Blake Nelson"],
+    summary:
+      "Kalkanı devralan Sam Wilson, kendini uluslararası bir komplonun tam ortasında bulur. Yeni bir Kaptan Amerika, dünyanın güvenini kazanırken kırmızı bir tehdit yükselmektedir.",
+    scene: "Başkanlık krizinde patlayan kırmızı tehlike",
+    img: IMG("/8eifdha9GQeZAkexgtD45546XKx.jpg"),
+    colorA: "#b91c1c",
+    colorB: "#1e3a8a",
+  },
+  {
+    id: "thunderbolts",
+    title: "Thunderbolts*",
+    year: 2025,
+    phase: "Faz 5",
+    producer: "Marvel Studios — Kevin Feige",
+    director: "Jake Schreier",
+    cast: ["Florence Pugh", "Sebastian Stan", "David Harbour", "Julia Louis-Dreyfus"],
+    summary:
+      "Bir grup eski kötü ve anti-kahraman, kendilerini ortadan kaldırmak için kurulmuş ölümcül bir tuzağın içinde bulur. Hayatta kalmanın tek yolu: en güvenmedikleri kişilerle bir takım olmak.",
+    scene: "Karanlığın yuttuğu boşlukla yüzleşme anı",
+    img: IMG("/rthMuZfFv4fqEU4JVbgSW9wQ8rs.jpg"),
+    colorA: "#991b1b",
+    colorB: "#1f2937",
+  },
+];
+
+// Görselleri yerel dosyalara bağla. Normal kapak ve hover sahnesi FARKLI fotolar:
+//  img      -> kart durağan haldeyken görünen kapak (assets/images/covers/<id>.jpg)
+//  hoverImg -> üzerine gelince Three.js'in gösterdiği ikinci sahne (assets/images/scenes/<id>.jpg)
+// Not: Yollar HTML belgesine (kök dizindeki index.html) görelidir.
+FILMS.forEach((f) => {
+  f.img = `assets/images/covers/${f.id}.jpg`;
+  f.hoverImg = `assets/images/scenes/${f.id}.jpg`;
+});
+
+export { FILMS };
