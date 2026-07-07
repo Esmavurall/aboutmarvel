@@ -131,7 +131,7 @@ npx serve .
 py -m http.server 8000
 ```
 
-Ardından tarayıcıda: `http://localhost:8000`
+Ardından tarayıcıda: `https://esmavurall.github.io/aboutmarvel/`
 
 > İçeriği değiştirmek için yeni filmi `js/data.js` içindeki `FILMS` dizisine ekle ve
 > görsellerini `assets/images/covers/<id>.jpg` ile `assets/images/scenes/<id>.jpg`
