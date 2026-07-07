@@ -1,5 +1,7 @@
 # 🎬 MARVEL · Sinematik Evren Kataloğu
 
+tarayıcı: 'https://esmavurall.github.io/aboutmarvel/'
+
 Marvel Sinematik Evreni'ndeki (MCU) filmlerin **vurucu sahnelerini broşür kapağı**
 olarak sunan, modern ve sade bir film kataloğu. Her kartın üzerine gelindiğinde
 **Three.js** ile sahne 3 boyutlu canlanır; altında filmin künyesi açılır.
