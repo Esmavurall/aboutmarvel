@@ -26,7 +26,7 @@ olarak sunan, modern ve sade bir film kataloğu. Her kartın üzerine gelindiği
 ## 📁 Proje Yapısı
 
 ```
-deneme/
+aboutmarvel/
 ├── index.html                  # Giriş noktası: iskelet, hero, arama/filtre, CDN'ler
 ├── README.md                   # Bu dosya
 │
