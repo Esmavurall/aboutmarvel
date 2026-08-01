@@ -1,25 +1,6 @@
-/* ============================================================================
- * data.js — TEK VERİ KAYNAĞI (Marvel Sinematik Evreni / MCU)
- * `FILMS` dizisini dışa aktarır. main.js bu diziden kartları üretir.
- *
- * Her film nesnesinin alanları:
- *   id       : benzersiz kimlik (görsel dosya adlarıyla AYNI olmalı)
- *   title    : film ismi          | year   : yıl       | phase: "Faz 1..5"
- *   producer : yapımcı            | director: yönetmen
- *   cast[]   : başrol oyuncuları  | summary: merak uyandıran özet
- *   scene    : vurucu sahne etiketi
- *   colorA/B : kart paleti (görsel yüklenemezse gradient ve parıltı rengi)
- *   img      : (sonda eklenir) durağan kapak görseli
- *   hoverImg : (sonda eklenir) hover'da gösterilen farklı sahne
- *
- * Görseller YEREL klasörden sunulur; dış siteye (TMDB) bağımlı değildir.
- * (IMG yardımcı fonksiyonu yalnızca görsellerin kaynağını belgeler; gerçek
- *  yollar dosyanın sonundaki forEach ile yerel klasöre bağlanır.)
- * ========================================================================== */
 const IMG = (p) => `https://image.tmdb.org/t/p/w1280${p}`;
 
 const FILMS = [
-  // ───────────────────────── FAZ 1 ─────────────────────────
   {
     id: "iron-man",
     title: "Iron Man",
@@ -110,8 +91,6 @@ const FILMS = [
     colorA: "#1e40af",
     colorB: "#7f1d1d",
   },
-
-  // ───────────────────────── FAZ 2 ─────────────────────────
   {
     id: "iron-man-3",
     title: "Iron Man 3",
@@ -202,8 +181,6 @@ const FILMS = [
     colorA: "#0f766e",
     colorB: "#111827",
   },
-
-  // ───────────────────────── FAZ 3 ─────────────────────────
   {
     id: "civil-war",
     title: "Captain America: Civil War",
@@ -354,8 +331,6 @@ const FILMS = [
     colorA: "#1f2937",
     colorB: "#b45309",
   },
-
-  // ───────────────────────── FAZ 4 ─────────────────────────
   {
     id: "black-widow",
     title: "Black Widow",
@@ -461,8 +436,6 @@ const FILMS = [
     colorA: "#1e3a8a",
     colorB: "#4c1d95",
   },
-
-  // ───────────────────────── FAZ 5 ─────────────────────────
   {
     id: "quantumania",
     title: "Ant-Man and the Wasp: Quantumania",
@@ -555,10 +528,6 @@ const FILMS = [
   },
 ];
 
-// Görselleri yerel dosyalara bağla. Normal kapak ve hover sahnesi FARKLI fotolar:
-//  img      -> kart durağan haldeyken görünen kapak (assets/images/covers/<id>.jpg)
-//  hoverImg -> üzerine gelince Three.js'in gösterdiği ikinci sahne (assets/images/scenes/<id>.jpg)
-// Not: Yollar HTML belgesine (kök dizindeki index.html) görelidir.
 FILMS.forEach((f) => {
   f.img = `assets/images/covers/${f.id}.jpg`;
   f.hoverImg = `assets/images/scenes/${f.id}.jpg`;

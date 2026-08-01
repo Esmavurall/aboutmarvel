@@ -1,37 +1,24 @@
-/* ============================================================================
- * main.js — UYGULAMA MANTIĞI
- * Bu dosya neler yapar:
- *   1) Three.js hover modülünü (opsiyonel) yükler          → satır ~10
- *   2) DOM referansları + durum (filtre/arama)             → satır ~16
- *   3) Faz filtre çiplerini oluşturur                      → satır ~26
- *   4) Arama kutusunu dinler                               → satır ~45
- *   5) matches()  — bir filmin filtre/aramaya uyup uymadığı→ satır ~50
- *   6) cardHTML() — tek bir film kartının HTML'i           → satır ~60
- *   7) hexGlow()  — hex rengi saydam parıltıya çevirir     → satır ~100
- *   8) render()   — kartları basar + olayları bağlar       → satır ~110
- * ========================================================================== */
-
 import { FILMS } from "./data.js";
 
-// Three.js hover efekti OPSİYONELDİR. unpkg erişilemezse (ör. ağ engeli) bile
-// katalog ve görseller sorunsuz yüklenmeli; bu yüzden dinamik import ile,
-// hata durumunda sessizce saf-CSS hover'a düşecek şekilde yüklüyoruz.
 let fx = null;
 import("./scene3d.js")
-  .then((m) => { fx = m; })
+  .then((m) => {
+    fx = m;
+    if (fx.preload) {
+      fx.preload(FILMS.map((f) => f.hoverImg || f.img));
+    }
+  })
   .catch((e) => console.warn("3B efekt yüklenemedi, CSS hover kullanılacak.", e));
 
-// --- DOM referansları (index.html'deki id'ler) ---
-const grid = document.getElementById("grid");       // kartların basıldığı konteyner
-const empty = document.getElementById("empty");      // "sonuç yok" mesajı
-const search = document.getElementById("search");    // arama kutusu
-const filtersEl = document.getElementById("filters"); // faz çiplerinin konteyneri
+const grid = document.getElementById("grid");
+const empty = document.getElementById("empty");
+const search = document.getElementById("search");
+const filtersEl = document.getElementById("filters");
 console.log("Katalog.js: %c%s", "color: #f00; font-weight: bold;", "MCU katalogu yüklendi.");
-// --- Uygulama durumu: o an seçili filtre ve arama metni ---
+
 let activeFilter = "Tümü";
 let query = "";
 
-// --- Filtre çipleri (Fazlar) ---
 const phases = ["Tümü", ...Array.from(new Set(FILMS.map((f) => f.phase)))];
 phases.forEach((p) => {
   const b = document.createElement("button");
@@ -47,14 +34,11 @@ phases.forEach((p) => {
   filtersEl.appendChild(b);
 });
 
-// Arama kutusuna her yazışta sorguyu güncelle ve listeyi yeniden çiz
 search.addEventListener("input", (e) => {
   query = e.target.value.trim().toLowerCase();
   render();
 });
 
-// matches(f): film aktif faz filtresine VE arama metnine uyuyor mu?
-// (başlık, yönetmen, yapımcı, faz ve oyuncular içinde arar)
 function matches(f) {
   if (activeFilter !== "Tümü" && f.phase !== activeFilter) return false;
   if (!query) return true;
@@ -64,9 +48,6 @@ function matches(f) {
   return hay.includes(query);
 }
 
-// cardHTML(f): tek bir filmin broşür kartının HTML metnini üretir.
-// Katman sırası (arkadan öne): kapak görseli > gradient fallback > karartma >
-// rozetler (faz/yıl) > içerik (başlık, sahne, hover'da açılan künye).
 function cardHTML(f) {
   const castChips = f.cast
     .map((c) => `<span class="cast-chip">${c}</span>`)
@@ -106,7 +87,6 @@ function cardHTML(f) {
   `;
 }
 
-// Kart parlamasını rengin saydam haline çevir
 function hexGlow(hex) {
   const c = hex.replace("#", "");
   const r = parseInt(c.substring(0, 2), 16);
@@ -115,9 +95,6 @@ function hexGlow(hex) {
   return `rgba(${r}, ${g}, ${b}, 0.55)`;
 }
 
-// render(): filtreye uyan filmleri kartlara basar, "sonuç yok" durumunu ayarlar
-// ve her karta görsel-hata + hover (Three.js) olaylarını bağlar.
-// Filtre/arama her değiştiğinde yeniden çağrılır.
 function render() {
   const list = FILMS.filter(matches);
   grid.innerHTML = list.map(cardHTML).join("");
@@ -127,13 +104,12 @@ function render() {
     const card = grid.querySelector(`[data-id="${f.id}"]`);
     card.style.animationDelay = `${i * 0.05}s`;
 
-    // Görsel yüklenemezse fallback gradient zaten arkada; görseli gizle
     const img = card.querySelector(".film-cover");
     img.addEventListener("error", () => (img.style.display = "none"));
 
-    // Three.js hover bağlama (yüklendiyse). Yüklenmediyse CSS hover devrede.
     card.addEventListener("pointerenter", () => fx && fx.activate(card, f));
     card.addEventListener("pointerleave", () => fx && fx.deactivate(card));
+    card.addEventListener("pointercancel", () => fx && fx.deactivate(card));
     card.addEventListener("pointermove", (e) => {
       if (!fx) return;
       const r = card.getBoundingClientRect();
@@ -144,5 +120,4 @@ function render() {
   });
 }
 
-// İlk açılışta kataloğu çiz (tüm filmler)
 render();

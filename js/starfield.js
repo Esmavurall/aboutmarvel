@@ -1,24 +1,7 @@
-/* ============================================================================
- * starfield.js — ARKA PLAN 3B YILDIZ ALANI (Three.js, dekoratif)
- * En arkada (z-index:0, içeriğin ALTINDA), tüm ekranı kaplayan sabit bir
- * WebGL canvas'ı oluşturur. Fare hareket ettikçe kamera/parallax kayar ve
- * yıldızlar 3 boyutlu derinlik hissiyle hareket eder. pointer-events:none
- * olduğu için kartlara veya tıklamalara HİÇBİR etkisi yoktur.
- *
- * Dosya haritası:
- *   - Renderer + canvas'ı en arkaya yerleştirme   → satır ~20
- *   - Sahne + kamera                              → satır ~38
- *   - makeStarTexture(): yuvarlak yıldız dokusu   → satır ~43
- *   - makeLayer()     : bir yıldız katmanı üretir → satır ~62
- *   - far / near katmanları (parallax için iki kat)→ satır ~88
- *   - Fare + resize dinleyicileri                 → satır ~92
- *   - loop(): her karede süzülme + parallax çizimi→ satır ~108
- * ========================================================================== */
 import * as THREE from "three";
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// --- Canvas (en arkaya yerleştir) ---
 const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 const canvas = renderer.domElement;
@@ -31,14 +14,12 @@ Object.assign(canvas.style, {
   zIndex: "0",
   pointerEvents: "none",
 });
-document.body.prepend(canvas); // body'nin ilk çocuğu → her şeyin arkasında
+document.body.prepend(canvas);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 2000);
 camera.position.z = 320;
 
-// makeStarTexture(): canvas 2D radial gradient ile yuvarlak/yumuşak yıldız dokusu
-// üretir (kare nokta yerine ışıltılı yuvarlak görünüm için).
 function makeStarTexture() {
   const c = document.createElement("canvas");
   c.width = c.height = 64;
@@ -55,14 +36,9 @@ function makeStarTexture() {
   return tex;
 }
 
-// --- Yıldızlar (iki katman: uzak + yakın → güçlü parallax) ---
 const starGroup = new THREE.Group();
 scene.add(starGroup);
 
-// makeLayer(...): tek bir yıldız katmanı oluşturur (rastgele konumlu Points).
-//   count    : yıldız sayısı | spreadXY/Z: yayılım | size: boyut
-//   opacity  : saydamlık     | tint      : renk tonu
-// Katmanı starGroup'a ekler ve Points nesnesini döndürür.
 function makeLayer(count, spreadXY, spreadZ, size, opacity, tint) {
   const positions = new Float32Array(count * 3);
   for (let i = 0; i < count; i++) {
@@ -88,11 +64,9 @@ function makeLayer(count, spreadXY, spreadZ, size, opacity, tint) {
 }
 
 const starTexture = makeStarTexture();
-const far = makeLayer(1400, 1600, 900, 2.2, 0.7, 0x8fa6ff);   // uzak, mavimsi
-const near = makeLayer(900, 1200, 600, 4.5, 0.95, 0xffffff);  // yakın, beyaz parlak
+const far = makeLayer(1400, 1600, 900, 2.2, 0.7, 0x8fa6ff);
+const near = makeLayer(900, 1200, 600, 4.5, 0.95, 0xffffff);
 
-// --- Fare etkileşimi: konumu -1..1 aralığına çevirip hedef değişkenlere yaz ---
-// (loop() içinde bu hedeflere doğru yumuşatma yapılır → akıcı parallax)
 let targetX = 0;
 let targetY = 0;
 window.addEventListener("pointermove", (e) => {
@@ -107,23 +81,17 @@ window.addEventListener("resize", () => {
 });
 renderer.setSize(window.innerWidth, window.innerHeight, false);
 
-// loop(): her karede çalışır. Sürekli yavaş süzülme + fareye doğru yumuşatılmış
-// kamera/katman kayması ile 3B parallax üretir, sonra sahneyi çizer.
-// (prefers-reduced-motion açıksa hareket atlanır, sadece çizim yapılır.)
 const clock = new THREE.Clock();
 function loop() {
   requestAnimationFrame(loop);
   const t = clock.getElapsedTime();
 
   if (!reduceMotion) {
-    // sürekli yavaş süzülme (canlılık)
     starGroup.rotation.y = t * 0.02;
     starGroup.rotation.x = Math.sin(t * 0.05) * 0.03;
 
-    // fareye doğru yumuşatılmış parallax (3B derinlik)
     camera.position.x += (targetX * 60 - camera.position.x) * 0.04;
     camera.position.y += (-targetY * 60 - camera.position.y) * 0.04;
-    // farklı katmanlar farklı tepki → derinlik
     far.rotation.y = -targetX * 0.05;
     near.rotation.y = -targetX * 0.12;
     near.rotation.x = targetY * 0.12;
